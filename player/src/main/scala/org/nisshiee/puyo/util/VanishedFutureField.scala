@@ -8,6 +8,6 @@ case class VanishedFutureField private (puyos: Map[InFieldPoint, Puyo])
 
 object VanishedFutureField {
 
-  def apply(df: DroppedFutureField)(implicit f: Field): VanishedFutureField =
-    VanishedFutureField(Map[InFieldPoint, Puyo]())
+  def apply(df: DroppedFutureField)(implicit f: Field): (VanishedFutureField, Int) =
+    (VanishedFutureField(Map[InFieldPoint, Puyo]()), 0)
 }
