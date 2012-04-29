@@ -12,7 +12,15 @@ case class DroppedFutureField private (puyos: Map[InFieldPoint, Puyo]) {
 
 object DroppedFutureField {
 
-  def apply(pb: PuyoBlock, a: Action, puyos: Map[InFieldPoint, Puyo])(implicit f: Field): DroppedFutureField = {
+  def apply(pb: PuyoBlock, a: Action)(implicit f: Field): DroppedFutureField =
+    apply(pb, a, f.puyos)
+
+  private def apply(
+    pb: PuyoBlock,
+    a: Action,
+    puyos: Map[InFieldPoint, Puyo]
+  )(implicit f: Field): DroppedFutureField = {
+
     val droppings = a match {
       case Action(Up, c) => List((pb.base, c), (pb.sub, c))
       case Action(Down, c) => List((pb.sub, c), (pb.base, c))
@@ -32,4 +40,3 @@ object DroppedFutureField {
     droppings.foldl(puyos)(drop) |> { DroppedFutureField(_) }
   }
 }
-  

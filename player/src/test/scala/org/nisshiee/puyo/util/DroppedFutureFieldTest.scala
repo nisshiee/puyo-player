@@ -34,7 +34,7 @@ class DroppedFutureFieldTest extends Specification { def is =
       a <- Action.check(Up, 2)
       redpoint <- Point(2, 0).in
       bluepoint <- Point(2, 1).in
-      ff = DroppedFutureField(PuyoBlock(Red, Blue), a, f.puyos)
+      ff = DroppedFutureField(PuyoBlock(Red, Blue), a)
       assertred <- ff(redpoint) ∘ (_ ≟ Red)
       assertblue <- ff(bluepoint) ∘ (_ ≟ Blue)
     } yield assertred && assertblue) must beSome.which(identity)
@@ -43,7 +43,7 @@ class DroppedFutureFieldTest extends Specification { def is =
       a <- Action.check(Down, 2)
       redpoint <- Point(2, 1).in
       bluepoint <- Point(2, 0).in
-      ff = DroppedFutureField(PuyoBlock(Red, Blue), a, f.puyos)
+      ff = DroppedFutureField(PuyoBlock(Red, Blue), a)
       assertred <- ff(redpoint) ∘ (_ ≟ Red)
       assertblue <- ff(bluepoint) ∘ (_ ≟ Blue)
     } yield assertred && assertblue) must beSome.which(identity)
@@ -52,7 +52,7 @@ class DroppedFutureFieldTest extends Specification { def is =
       a <- Action.check(Right, 2)
       redpoint <- Point(2, 0).in
       bluepoint <- Point(3, 0).in
-      ff = DroppedFutureField(PuyoBlock(Red, Blue), a, f.puyos)
+      ff = DroppedFutureField(PuyoBlock(Red, Blue), a)
       assertred <- ff(redpoint) ∘ (_ ≟ Red)
       assertblue <- ff(bluepoint) ∘ (_ ≟ Blue)
     } yield assertred && assertblue) must beSome.which(identity)
@@ -61,7 +61,7 @@ class DroppedFutureFieldTest extends Specification { def is =
       a <- Action.check(Left, 2)
       redpoint <- Point(2, 0).in
       bluepoint <- Point(1, 0).in
-      ff = DroppedFutureField(PuyoBlock(Red, Blue), a, f.puyos)
+      ff = DroppedFutureField(PuyoBlock(Red, Blue), a)
       assertred <- ff(redpoint) ∘ (_ ≟ Red)
       assertblue <- ff(bluepoint) ∘ (_ ≟ Blue)
     } yield assertred && assertblue) must beSome.which(identity)
@@ -91,7 +91,7 @@ class DroppedFutureFieldTest extends Specification { def is =
       a <- Action.check(Up, 2)
       redpoint <- Point(2, 1).in
       bluepoint <- Point(2, 2).in
-      ff = DroppedFutureField(PuyoBlock(Red, Blue), a, f.puyos)
+      ff = DroppedFutureField(PuyoBlock(Red, Blue), a)
       assertred <- ff(redpoint) ∘ (_ ≟ Red)
       assertblue <- ff(bluepoint) ∘ (_ ≟ Blue)
     } yield assertred && assertblue) must beSome.which(identity)
@@ -100,7 +100,7 @@ class DroppedFutureFieldTest extends Specification { def is =
       a <- Action.check(Down, 2)
       redpoint <- Point(2, 2).in
       bluepoint <- Point(2, 1).in
-      ff = DroppedFutureField(PuyoBlock(Red, Blue), a, f.puyos)
+      ff = DroppedFutureField(PuyoBlock(Red, Blue), a)
       assertred <- ff(redpoint) ∘ (_ ≟ Red)
       assertblue <- ff(bluepoint) ∘ (_ ≟ Blue)
     } yield assertred && assertblue) must beSome.which(identity)
@@ -109,7 +109,7 @@ class DroppedFutureFieldTest extends Specification { def is =
       a <- Action.check(Right, 2)
       redpoint <- Point(2, 1).in
       bluepoint <- Point(3, 1).in
-      ff = DroppedFutureField(PuyoBlock(Red, Blue), a, f.puyos)
+      ff = DroppedFutureField(PuyoBlock(Red, Blue), a)
       assertred <- ff(redpoint) ∘ (_ ≟ Red)
       assertblue <- ff(bluepoint) ∘ (_ ≟ Blue)
     } yield assertred && assertblue) must beSome.which(identity)
@@ -118,7 +118,7 @@ class DroppedFutureFieldTest extends Specification { def is =
       a <- Action.check(Left, 3)
       redpoint <- Point(3, 1).in
       bluepoint <- Point(2, 1).in
-      ff = DroppedFutureField(PuyoBlock(Red, Blue), a, f.puyos)
+      ff = DroppedFutureField(PuyoBlock(Red, Blue), a)
       assertred <- ff(redpoint) ∘ (_ ≟ Red)
       assertblue <- ff(bluepoint) ∘ (_ ≟ Blue)
     } yield assertred && assertblue) must beSome.which(identity)
@@ -127,7 +127,7 @@ class DroppedFutureFieldTest extends Specification { def is =
       a <- Action.check(Right, 4)
       redpoint <- Point(4, 2).in
       bluepoint <- Point(5, 0).in
-      ff = DroppedFutureField(PuyoBlock(Red, Blue), a, f.puyos)
+      ff = DroppedFutureField(PuyoBlock(Red, Blue), a)
       assertred <- ff(redpoint) ∘ (_ ≟ Red)
       assertblue <- ff(bluepoint) ∘ (_ ≟ Blue)
     } yield assertred && assertblue) must beSome.which(identity)
@@ -136,7 +136,7 @@ class DroppedFutureFieldTest extends Specification { def is =
       a <- Action.check(Left, 4)
       redpoint <- Point(4, 2).in
       bluepoint <- Point(3, 1).in
-      ff = DroppedFutureField(PuyoBlock(Red, Blue), a, f.puyos)
+      ff = DroppedFutureField(PuyoBlock(Red, Blue), a)
       assertred <- ff(redpoint) ∘ (_ ≟ Red)
       assertblue <- ff(bluepoint) ∘ (_ ≟ Blue)
     } yield assertred && assertblue) must beSome.which(identity)
