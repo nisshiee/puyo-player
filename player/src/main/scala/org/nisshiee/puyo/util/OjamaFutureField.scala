@@ -12,6 +12,6 @@ object OjamaFutureField {
     vf: VanishedFutureField
     ,ojamaQueue: List[Int]
     ,attack: Int
-  )(implicit f: Field): (OjamaFutureField, List[Int]) =
-    (OjamaFutureField(Map()), List())
+  )(implicit f: Field): (OjamaFutureField, List[Int], Int) =
+    (OjamaFutureField(Map()), List(), 0)
 }
