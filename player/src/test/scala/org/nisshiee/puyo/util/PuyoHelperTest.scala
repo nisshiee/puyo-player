@@ -11,6 +11,15 @@ class PuyoHelperTest extends Specification { def is =
   "PuyoHelperオブジェクトのテスト"                          ^
     "connectPuyo関数のテスト"                               ^
       "いろいろ含むケース"                                  ! SizedFieldMock().e1^
+                                                            p^
+    "dropAll関数のテスト"                                   ^
+      "ぷよ1個が1マス落ちるケース"                          ! SizedFieldMock().e2^
+      "ぷよ1個が2マス落ちるケース"                          ! SizedFieldMock().e3^
+      "ぷよ2個が1マス落ちるケース"                          ! SizedFieldMock().e4^
+      "ぷよ1個が1マス、1個が2マス落ちるケース"              ! SizedFieldMock().e5^
+      "別の列で別の位置から落ちるケース"                    ! SizedFieldMock().e6^
+      "いろいろなパターンが混在するケース"                  ! SizedFieldMock().e7^
+      "動くぷよが無いケース"                                ! SizedFieldMock().e8^
                                                             end
 
   case class SizedFieldMock() extends Mockito {
@@ -155,6 +164,112 @@ class PuyoHelperTest extends Specification { def is =
       )
 
       connectPuyo(puyos) must_== expected
+    }
+
+    def e2 = {
+      val puyos: Map[InFieldPoint, Puyo] = Map(
+        Point(1, 1).in ∘ (_ -> Red) err "error"
+      )
+
+      val expected: Map[InFieldPoint, Puyo] = Map(
+        Point(1, 0).in ∘ (_ -> Red) err "error"
+      )
+
+      dropAll(puyos) must_== expected
+    }
+
+    def e3 = {
+      val puyos: Map[InFieldPoint, Puyo] = Map(
+        Point(1, 2).in ∘ (_ -> Red) err "error"
+      )
+
+      val expected: Map[InFieldPoint, Puyo] = Map(
+        Point(1, 0).in ∘ (_ -> Red) err "error"
+      )
+
+      dropAll(puyos) must_== expected
+    }
+
+    def e4 = {
+      val puyos: Map[InFieldPoint, Puyo] = Map(
+        Point(1, 1).in ∘ (_ -> Red) err "error"
+        ,Point(1, 2).in ∘ (_ -> Blue) err "error"
+      )
+
+      val expected: Map[InFieldPoint, Puyo] = Map(
+        Point(1, 0).in ∘ (_ -> Red) err "error"
+        ,Point(1, 1).in ∘ (_ -> Blue) err "error"
+      )
+
+      dropAll(puyos) must_== expected
+    }
+
+    def e5 = {
+      val puyos: Map[InFieldPoint, Puyo] = Map(
+        Point(1, 1).in ∘ (_ -> Red) err "error"
+        ,Point(1, 3).in ∘ (_ -> Blue) err "error"
+      )
+
+      val expected: Map[InFieldPoint, Puyo] = Map(
+        Point(1, 0).in ∘ (_ -> Red) err "error"
+        ,Point(1, 1).in ∘ (_ -> Blue) err "error"
+      )
+
+      dropAll(puyos) must_== expected
+    }
+
+    def e6 = {
+      val puyos: Map[InFieldPoint, Puyo] = Map(
+        Point(1, 1).in ∘ (_ -> Red) err "error"
+        ,Point(2, 0).in ∘ (_ -> Blue) err "error"
+        ,Point(2, 3).in ∘ (_ -> Green) err "error"
+      )
+
+      val expected: Map[InFieldPoint, Puyo] = Map(
+        Point(1, 0).in ∘ (_ -> Red) err "error"
+        ,Point(2, 0).in ∘ (_ -> Blue) err "error"
+        ,Point(2, 1).in ∘ (_ -> Green) err "error"
+      )
+
+      dropAll(puyos) must_== expected
+    }
+
+    def e7 = {
+      val puyos: Map[InFieldPoint, Puyo] = Map(
+        Point(0, 1).in ∘ (_ -> Red) err "error"
+        ,Point(1, 2).in ∘ (_ -> Blue) err "error"
+        ,Point(2, 1).in ∘ (_ -> Green) err "error"
+        ,Point(2, 4).in ∘ (_ -> Yellow) err "error"
+        ,Point(3, 0).in ∘ (_ -> Purple) err "error"
+        ,Point(3, 4).in ∘ (_ -> Ojama) err "error"
+        ,Point(3, 5).in ∘ (_ -> Red) err "error"
+      )
+
+      val expected: Map[InFieldPoint, Puyo] = Map(
+        Point(0, 0).in ∘ (_ -> Red) err "error"
+        ,Point(1, 0).in ∘ (_ -> Blue) err "error"
+        ,Point(2, 0).in ∘ (_ -> Green) err "error"
+        ,Point(2, 1).in ∘ (_ -> Yellow) err "error"
+        ,Point(3, 0).in ∘ (_ -> Purple) err "error"
+        ,Point(3, 1).in ∘ (_ -> Ojama) err "error"
+        ,Point(3, 2).in ∘ (_ -> Red) err "error"
+      )
+
+      dropAll(puyos) must_== expected
+    }
+
+    def e8 = {
+      val puyos: Map[InFieldPoint, Puyo] = Map(
+        Point(0, 0).in ∘ (_ -> Red) err "error"
+        ,Point(1, 0).in ∘ (_ -> Blue) err "error"
+        ,Point(2, 0).in ∘ (_ -> Green) err "error"
+        ,Point(2, 1).in ∘ (_ -> Yellow) err "error"
+        ,Point(3, 0).in ∘ (_ -> Purple) err "error"
+        ,Point(3, 1).in ∘ (_ -> Ojama) err "error"
+        ,Point(3, 2).in ∘ (_ -> Red) err "error"
+      )
+
+      dropAll(puyos) must_== puyos
     }
   }
 }

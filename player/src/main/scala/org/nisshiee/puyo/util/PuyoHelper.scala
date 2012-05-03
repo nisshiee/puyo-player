@@ -59,4 +59,19 @@ object PuyoHelper {
     val acc = (puyos, Set[(Set[InFieldPoint], Puyo)]())
     allIfp.foldl(acc)(foldfun) |> { case (_, result) => result }
   }
+
+  def dropAll(puyos: Map[InFieldPoint, Puyo])(implicit f: Field): Map[InFieldPoint, Puyo] = {
+    def dropColumn(x: Int): List[(InFieldPoint, Puyo)] = {
+      val l = ifpColumn(x) ∘ (puyos.get(_)) |> (_.flatten.zipWithIndex)
+      l ∘ {
+        case (puyo, y) => Point(x, y).in ∘ (_ -> puyo)
+      } |> (_.flatten)
+    }
+
+    (for {
+      x <- 0 until f.width
+      t <- dropColumn(x)
+    } yield t).toMap
+  }
+
 }
