@@ -30,6 +30,16 @@ class OjamaFutureFieldTest extends Specification { def is =
       "OjamaQueueの1,2番目を全部、3番目の一部を相殺"        ! SizedFieldMock().e19^
       "OjamaQueueの1,2,3番目全部でぴったり相殺"             ! SizedFieldMock().e20^
       "OjamaQueueの1,2,3番目全部相殺＆余剰分攻撃"           ! SizedFieldMock().e21^
+                                                            p^
+    "cancel関数のテスト"                                    ^
+      "OjamaQueueが空なら全弾攻撃になる"                    ! e22^
+      "OjamaQueueの1番目の一部を相殺"                       ! e23^
+      "OjamaQueueの1番目は空、2番目の一部を相殺"            ! e24^
+      "OjamaQueueの1,2番目は空、3番目の一部を相殺"          ! e25^
+      "OjamaQueueの1番目を全部、2番目の一部を相殺"          ! e26^
+      "OjamaQueueの1,2番目を全部、3番目の一部を相殺"        ! e27^
+      "OjamaQueueの1,2,3番目全部でぴったり相殺"             ! e28^
+      "OjamaQueueの1,2,3番目全部相殺＆余剰分攻撃"           ! e29^
                                                             end
 
   case class SizedFieldMock() extends Mockito {
@@ -324,7 +334,7 @@ class OjamaFutureFieldTest extends Specification { def is =
         Point(2, 0).in ∘ (_ -> Red) err "error"
       )
       setPuyo(puyos)
-      val ojamaQueue = List(16, 0, 0, 0)
+      val ojamaQueue = List(30, 0, 0, 0)
       val attack = 0
 
       val expected = puyos ++ Map(
@@ -377,7 +387,7 @@ class OjamaFutureFieldTest extends Specification { def is =
       val (of, nextQueue, atk) = OjamaFutureField(vf, ojamaQueue, attack)
       (of.puyos must_== puyos) and
         (nextQueue must_== ojamaQueue.tail) and
-        (attack must_== 10)
+        (atk must_== 10)
     }
 
     def e15 = {
@@ -400,7 +410,7 @@ class OjamaFutureFieldTest extends Specification { def is =
       val (of, nextQueue, atk) = OjamaFutureField(vf, ojamaQueue, attack)
       (of.puyos must_== expected) and
         (nextQueue must_== ojamaQueue.tail) and
-        (attack must_== 0)
+        (atk must_== 0)
     }
 
     def e16 = {
@@ -414,7 +424,7 @@ class OjamaFutureFieldTest extends Specification { def is =
       val (of, nextQueue, atk) = OjamaFutureField(vf, ojamaQueue, attack)
       (of.puyos must_== puyos) and
         (nextQueue must_== List(5, 0, 0)) and
-        (attack must_== 0)
+        (atk must_== 0)
     }
 
     def e17 = {
@@ -428,7 +438,7 @@ class OjamaFutureFieldTest extends Specification { def is =
       val (of, nextQueue, atk) = OjamaFutureField(vf, ojamaQueue, attack)
       (of.puyos must_== puyos) and
         (nextQueue must_== List(0, 5, 0)) and
-        (attack must_== 0)
+        (atk must_== 0)
     }
 
     def e18 = {
@@ -442,7 +452,7 @@ class OjamaFutureFieldTest extends Specification { def is =
       val (of, nextQueue, atk) = OjamaFutureField(vf, ojamaQueue, attack)
       (of.puyos must_== puyos) and
         (nextQueue must_== List(10, 0, 0)) and
-        (attack must_== 0)
+        (atk must_== 0)
     }
 
     def e19 = {
@@ -456,7 +466,7 @@ class OjamaFutureFieldTest extends Specification { def is =
       val (of, nextQueue, atk) = OjamaFutureField(vf, ojamaQueue, attack)
       (of.puyos must_== puyos) and
         (nextQueue must_== List(0, 5, 0)) and
-        (attack must_== 0)
+        (atk must_== 0)
     }
 
     def e20 = {
@@ -470,7 +480,7 @@ class OjamaFutureFieldTest extends Specification { def is =
       val (of, nextQueue, atk) = OjamaFutureField(vf, ojamaQueue, attack)
       (of.puyos must_== puyos) and
         (nextQueue must_== List(0, 0, 0)) and
-        (attack must_== 0)
+        (atk must_== 0)
     }
 
     def e21 = {
@@ -484,7 +494,23 @@ class OjamaFutureFieldTest extends Specification { def is =
       val (of, nextQueue, atk) = OjamaFutureField(vf, ojamaQueue, attack)
       (of.puyos must_== puyos) and
         (nextQueue must_== List(0, 0, 0)) and
-        (attack must_== 15)
+        (atk must_== 15)
     }
   }
+
+  def e22 = OjamaFutureField.cancel(List(0, 0, 0, 0), 10) must_== (List(0, 0, 0, 0), 10)
+
+  def e23 = OjamaFutureField.cancel(List(20, 0, 0, 0), 10) must_== (List(10, 0, 0, 0), 0)
+
+  def e24 = OjamaFutureField.cancel(List(0, 20, 0, 0), 10) must_== (List(0, 10, 0, 0), 0)
+
+  def e25 = OjamaFutureField.cancel(List(0, 0, 20, 0), 10) must_== (List(0, 0, 10, 0), 0)
+
+  def e26 = OjamaFutureField.cancel(List(5, 15, 0, 0), 10) must_== (List(0, 10, 0, 0), 0)
+
+  def e27 = OjamaFutureField.cancel(List(5, 5, 15, 0), 15) must_== (List(0, 0, 10, 0), 0)
+
+  def e28 = OjamaFutureField.cancel(List(5, 5, 5, 0), 15) must_== (List(0, 0, 0, 0), 0)
+
+  def e29 = OjamaFutureField.cancel(List(5, 5, 5, 0), 20) must_== (List(0, 0, 0, 0), 5)
 }
