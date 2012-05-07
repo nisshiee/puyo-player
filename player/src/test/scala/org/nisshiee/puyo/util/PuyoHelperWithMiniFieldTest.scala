@@ -26,6 +26,10 @@ class PuyoHelperWithMiniFieldTest extends Specification { def is =
                                                             p^
     "nextIfp関数のテスト - MiniField(height = 3)"           ^
       "(2, 1) => (2, 2), (2, 0), (1, 1), (3, 1)"            ! MiniFieldMock().e8^
+                                                            p^
+    "allChoices関数のテスト"                                ^
+      "違う色からなるPuyoBlockの場合"                       ! MiniFieldMock2().e9^
+      "同じ色からなるPuyoBlockの場合 - UpとRightのみとなる" ! MiniFieldMock2().e10^
                                                             end
 
   case class MiniFieldMock() extends Mockito {
@@ -93,6 +97,34 @@ class PuyoHelperWithMiniFieldTest extends Specification { def is =
         ,Point(3, 1).in err "error"
       )
     }
+  }
+
+  case class MiniFieldMock2() extends Mockito {
+
+    implicit val f = mock[Field]
+    f.width returns 3
+    f.height returns 4
+
+    def e9 = allChoices(PuyoBlock(Red, Blue)).toSet must contain(
+      Action.check(Up, 0) err "error"
+      ,Action.check(Up, 1) err "error"
+      ,Action.check(Up, 2) err "error"
+      ,Action.check(Down, 0) err "error"
+      ,Action.check(Down, 1) err "error"
+      ,Action.check(Down, 2) err "error"
+      ,Action.check(Right, 0) err "error"
+      ,Action.check(Right, 1) err "error"
+      ,Action.check(Left, 1) err "error"
+      ,Action.check(Left, 2) err "error"
+    ).only
+
+    def e10 = allChoices(PuyoBlock(Red, Red)).toSet must contain(
+      Action.check(Up, 0) err "error"
+      ,Action.check(Up, 1) err "error"
+      ,Action.check(Up, 2) err "error"
+      ,Action.check(Right, 0) err "error"
+      ,Action.check(Right, 1) err "error"
+    ).only
   }
 
 }

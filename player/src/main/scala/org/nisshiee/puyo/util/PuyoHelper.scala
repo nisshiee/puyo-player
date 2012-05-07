@@ -74,4 +74,21 @@ object PuyoHelper {
     } yield t).toMap
   }
 
+  def allChoices(pb: PuyoBlock)(implicit f: Field): List[Action] = {
+
+    def forDirection: Direction => List[Action] = {
+      case Right => (0 until (f.width - 1)) ∘ { x => Action.check(Right, x) } |> (_.toList.flatten)
+      case Left => (1 until f.width) ∘ { x => Action.check(Left, x) } |> (_.toList.flatten)
+      case d => (0 until f.width) ∘ { x => Action.check(d, x) } |> (_.toList.flatten)
+    }
+
+    def directions: PuyoBlock => List[Direction] = { pb =>
+      if (pb.base ≟ pb.sub)
+        List(Up, Right)
+      else
+        List(Up, Down, Right, Left)
+    }
+
+    directions(pb) >>= forDirection
+  }
 }
