@@ -15,6 +15,9 @@ object DroppedFutureField {
   def apply(pb: PuyoBlock, a: Action)(implicit f: Field): DroppedFutureField =
     apply(pb, a, f.puyos)
 
+  def apply(pb: PuyoBlock, a:Action, of: OjamaFutureField)(implicit f: Field): DroppedFutureField =
+    apply(pb, a, of.puyos)
+
   private def apply(
     pb: PuyoBlock,
     a: Action,

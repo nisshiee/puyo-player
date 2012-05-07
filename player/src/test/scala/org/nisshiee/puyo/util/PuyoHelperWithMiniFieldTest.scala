@@ -30,6 +30,10 @@ class PuyoHelperWithMiniFieldTest extends Specification { def is =
     "allChoices関数のテスト"                                ^
       "違う色からなるPuyoBlockの場合"                       ! MiniFieldMock2().e9^
       "同じ色からなるPuyoBlockの場合 - UpとRightのみとなる" ! MiniFieldMock2().e10^
+                                                            p^
+    "isDead関数のテスト - MiniField(height = 3)"            ^
+      "死んでるケース"                                      ! MiniFieldMock2().e11^
+      "死んでるないケース"                                  ! MiniFieldMock2().e12^
                                                             end
 
   case class MiniFieldMock() extends Mockito {
@@ -105,6 +109,16 @@ class PuyoHelperWithMiniFieldTest extends Specification { def is =
     f.width returns 3
     f.height returns 4
 
+    val puyos = Map(
+      Point(0, 0).in ∘ (_ -> Red) err "error"
+      ,Point(0, 1).in ∘ (_ -> Red) err "error"
+    )
+
+    f.puyos returns puyos
+    f.apply(any[InFieldPoint]) answers {
+      case ifp: InFieldPoint => puyos.get(ifp)
+    }
+
     def e9 = allChoices(PuyoBlock(Red, Blue)).toSet must contain(
       Action.check(Up, 0) err "error"
       ,Action.check(Up, 1) err "error"
@@ -125,6 +139,16 @@ class PuyoHelperWithMiniFieldTest extends Specification { def is =
       ,Action.check(Right, 0) err "error"
       ,Action.check(Right, 1) err "error"
     ).only
+
+    def e11 = {
+      f.deadLine returns 1
+      isDead(puyos) must beTrue
+    }
+
+    def e12 = {
+      f.deadLine returns 2
+      isDead(puyos) must beFalse
+    }
   }
 
 }

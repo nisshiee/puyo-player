@@ -30,6 +30,7 @@ class OjamaFutureFieldTest extends Specification { def is =
       "OjamaQueueの1,2番目を全部、3番目の一部を相殺"        ! SizedFieldMock().e19^
       "OjamaQueueの1,2,3番目全部でぴったり相殺"             ! SizedFieldMock().e20^
       "OjamaQueueの1,2,3番目全部相殺＆余剰分攻撃"           ! SizedFieldMock().e21^
+      "deadLine以上には降らない"                            ! SizedFieldMock().e30^
                                                             p^
     "cancel関数のテスト"                                    ^
       "OjamaQueueが空なら全弾攻撃になる"                    ! e22^
@@ -495,6 +496,26 @@ class OjamaFutureFieldTest extends Specification { def is =
       (of.puyos must_== puyos) and
         (nextQueue must_== List(0, 0, 0)) and
         (atk must_== 15)
+    }
+
+    def e30 = {
+      val puyos = (0 until 11) ∘ (Point(0, _).in err "error") ∘ (_ -> Red) |> (_.toMap)
+      setPuyo(puyos)
+      val ojamaQueue = List(12, 0, 0, 0)
+      val attack = 0
+
+      val expected = puyos ++ (for {
+        x <- 1 until 6
+        y <- 0 until 2
+        ifp <- Point(x, y).in
+      } yield ifp -> Ojama) + (
+        (Point(0, 11).in err "error") -> Ojama
+      )
+
+      val (of, nextQueue, atk) = OjamaFutureField(vf, ojamaQueue, attack)
+      (of.puyos must_== expected) and
+        (nextQueue must_== ojamaQueue.tail) and
+        (attack must_== 0)
     }
   }
 

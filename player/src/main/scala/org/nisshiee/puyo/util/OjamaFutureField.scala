@@ -27,6 +27,7 @@ object OjamaFutureField {
     puyos: Map[InFieldPoint, Puyo], x: Int
   )(implicit f: Field): Map[InFieldPoint, Puyo] = (for {
     y <- nextPuyoHeight(x, puyos)
+    if y < f.deadLine
     ifp <- Point(x, y).in
   } yield puyos + (ifp -> Ojama)) | puyos
 

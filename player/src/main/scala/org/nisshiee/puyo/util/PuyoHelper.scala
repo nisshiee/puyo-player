@@ -91,4 +91,7 @@ object PuyoHelper {
 
     directions(pb) >>= forDirection
   }
+
+  def isDead(puyos: Map[InFieldPoint, Puyo])(implicit f: Field): Boolean =
+    (puyos.keys ∘ (_.p.y) |> (_.max)) >= f.deadLine
 }
