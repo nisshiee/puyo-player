@@ -12,7 +12,7 @@ class NisshieePlayer(name: String) extends Player[Int](name) {
 
   def init = 1
 
-  val pruningCount = 5
+  val pruningCount = 8
 
   /**
    * 1ターン目の予測・評価
@@ -21,28 +21,112 @@ class NisshieePlayer(name: String) extends Player[Int](name) {
     val (action, board) = c
     implicit val f: Field = board.field
     val df = DroppedFutureField(board.current, action)
-    val (vf, tmpAttack) = VanishedFutureField(df)
-    val (of, queue, attack) = OjamaFutureField(vf, board.ojamaQueue, tmpAttack)
+    val (vf, at) = VanishedFutureField(df)
+    val (of, queue, _) = OjamaFutureField(vf, board.ojamaQueue, at)
 
     val pbs = List(board.next, board.nextNext)
 
-    val evaluation =
-      if (isDead(df.puyos))
-        Evaluation(attack, -10000)
-      else {
-        val highest = of.puyos.keys ∘ (_.p.y) |> (_.max)
-        Evaluation(attack, -highest)
+    // 評価 ここから ----------
+    val evaluation = {
+
+      val dead = if (isDead(df.puyos)) -10000 else 0
+      val connect = {
+        val connected = connectPuyo(df.puyos).toList
+        connected ∘ {
+          case (s, _) => s.size
+        } ∘ {
+          case 2 => 1
+          case i if i >= 3 => 2
+          case _ => 0
+        } |> (_.sum)
       }
+      val maxY = of.puyos.keys ∘ (_.p.y) |> { ps =>
+        if (ps.isEmpty) 0 else ps.max
+      }
+      val highest = {
+        if (maxY > f.deadLine / 2)
+          -maxY
+        else
+          0
+      }
+      val smallVanish = {
+        val vanish = df.puyos.size - vf.puyos.size
+        (maxY <= f.deadLine / 3 * 2, vanish > 0, at < 30) match {
+          case (true, true, true) => -1
+          case _ => 0
+        }
+      }
+      val attack = if (at > 5) at else 0
+      val nearDead = if (f.deadLine - maxY < 3) -1 else 0
+
+      val searchPoint = 30 * attack + connect + 100 * nearDead + dead
+      val pruningPoint = dead + 10 * connect + 10 * highest + 100 * smallVanish
+      Evaluation(searchPoint, pruningPoint)
+    }
+    // 評価 ここまで ----------
 
     FutureBoard(of, queue, pbs, evaluation)
+  }
+
+  def futureStep(t: (FutureBoard, Action))(implicit f: Field): FutureBoard = t match {
+    case (FutureBoard(lastOf, lastQ, pb :: nextPb, Evaluation(ls, _)), action) => {
+      val df = DroppedFutureField(pb, action, lastOf)
+      val (vf, at) = VanishedFutureField(df)
+      val (of, queue, _) = OjamaFutureField(vf, lastQ, at)
+
+      // 評価 ここから ----------
+      val evaluation = {
+
+        val dead = if (isDead(df.puyos)) -10000 else 0
+        val connect = {
+          val connected = connectPuyo(df.puyos).toList
+          connected ∘ {
+            case (s, _) => s.size
+          } ∘ {
+            case 2 => 1
+            case i if i >= 3 => 2
+            case _ => 0
+          } |> (_.sum)
+        }
+        val highest = {
+          val maxY = of.puyos.keys ∘ (_.p.y) |> { ps =>
+            if (ps.isEmpty) 0 else ps.max
+          }
+          if (maxY > f.deadLine / 2)
+            -maxY
+          else
+            0
+        }
+        val attack = if (at > 5) at else 0
+
+        val searchPoint = 30 * attack + connect + dead
+        val pruningPoint = dead + 10 * connect + 10 * highest
+        Evaluation(ls + searchPoint, pruningPoint)
+      }
+      // 評価 ここまで ----------
+
+      FutureBoard(of, queue, nextPb, evaluation)
+    }
   }
 
   /**
    * 2ターン目以降の予測・評価を再帰的に計算
    */
-  def future(fb: FutureBoard)(implicit f: Field): Evaluation = {
-    Evaluation(0, 0)
-  }
+  def future(fb: FutureBoard)(implicit f: Field): Evaluation =
+    
+    fb match {
+      case FutureBoard(_, _, Nil, e) => e
+      case FutureBoard(_, _, pb :: _, _) => {
+        val choices = allChoices(pb) ∘ (fb -> _) ∘ futureStep
+        val prunedChoices = choices sortBy {
+          case FutureBoard(_, _, _, Evaluation(_, p)) => -p
+        } take pruningCount
+
+        prunedChoices ∘ future maxBy {
+          case Evaluation(s, _) => s
+        }
+      }
+    }
 
   def choose(b: Board)(implicit f: Field): Action = {
     // まず1ターン分の予測
@@ -50,7 +134,7 @@ class NisshieePlayer(name: String) extends Player[Int](name) {
       allChoices(b.current) ∘ (_ -> b) ∘ { c => first(c) |> (c._1 -> _) }
     val prunedChoices: List[(Action, FutureBoard)] =
       firstChoices sortBy {
-        case (_, FutureBoard(_, _, _, Evaluation(_, p))) => p
+        case (_, FutureBoard(_, _, _, Evaluation(_, p))) => -p
       } take pruningCount
 
     // 計算並列化と、評価を1ターン目だけ別にする可能性を考慮し、
