@@ -43,6 +43,7 @@ class NisshieePlayer(name: String) extends Player[Int](name) {
       val maxY = of.puyos.keys ∘ (_.p.y) |> { ps =>
         if (ps.isEmpty) 0 else ps.max
       }
+      val pessimisticMaxY = maxY + (queue.sum / f.width)
       val highest = {
         if (maxY > f.deadLine / 2)
           -maxY
@@ -51,13 +52,13 @@ class NisshieePlayer(name: String) extends Player[Int](name) {
       }
       val smallVanish = {
         val vanish = df.puyos.size - vf.puyos.size
-        (maxY <= f.deadLine / 3 * 2, vanish > 0, at < 30) match {
+        (pessimisticMaxY <= f.deadLine / 3 * 2, vanish > 0, at < 30) match {
           case (true, true, true) => -1
           case _ => 0
         }
       }
       val attack = if (at > 5) at else 0
-      val nearDead = if (f.deadLine - maxY < 3) -1 else 0
+      val nearDead = if (f.deadLine - pessimisticMaxY < 2) -1 else 0
 
       val searchPoint = 30 * attack + connect + 100 * nearDead + dead
       val pruningPoint = dead + 10 * connect + 10 * highest + 100 * smallVanish
