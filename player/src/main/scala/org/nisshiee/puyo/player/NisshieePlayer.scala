@@ -108,6 +108,7 @@ class NisshieePlayer(name: String) extends Player[Int](name) {
 
       FutureBoard(of, queue, nextPb, evaluation)
     }
+    case (f, _) => f
   }
 
   /**
