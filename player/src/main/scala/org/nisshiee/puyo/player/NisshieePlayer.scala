@@ -108,6 +108,7 @@ class NisshieePlayer(name: String) extends Player[Int](name) {
 
       FutureBoard(of, queue, nextPb, evaluation)
     }
+    case (f, _) => f
   }
 
   /**
@@ -140,7 +141,7 @@ class NisshieePlayer(name: String) extends Player[Int](name) {
 
     // 計算並列化と、評価を1ターン目だけ別にする可能性を考慮し、
     // 1ターン目を評価してから、2ターン目以降を再起処理という流れに。
-    (prunedChoices ∘ {
+    (prunedChoices.par map {
       case (a, fb) => (a, future(fb))
     } maxBy {
       case (_, Evaluation(s, _)) => s
@@ -155,8 +156,6 @@ class NisshieePlayer(name: String) extends Player[Int](name) {
     turn: Int
   ): (Action, Int) = {
     implicit val f = myBoard.field
-    "=== turn " |+| turn.toString |+| " ===" |> (_.println)
-
     choose(myBoard) |> (_ -> (turn + 1))
   }
 }
